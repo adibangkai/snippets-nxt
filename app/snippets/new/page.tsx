@@ -1,28 +1,11 @@
-import { db } from "@/db";
-import { redirect } from "next/navigation";
+"use client";
+import { createSnippet } from "@/actions";
+import { useFormState } from "react-dom";
 
-export default async function NewSnippetPage() {
-  async function createSnippet(formData: FormData) {
-    //server action
-    "use server";
-
-    //validation
-    const title = formData.get("title") as string;
-    const code = formData.get("code") as string;
-
-    //create record
-    const snippet = await db.snippet.create({
-      data: {
-        title,
-        code,
-      },
-    });
-    console.log(snippet);
-    //redirect to root
-    redirect("/");
-  }
+export default function NewSnippetPage() {
+  const [formState, action] = useFormState(createSnippet, { message: "" });
   return (
-    <form action={createSnippet}>
+    <form action={action}>
       <h3 className="font-bold m-3">Create Snippet</h3>
       <div className="flex flex-col gap-4">
         <div className="flex gap-4">
@@ -46,6 +29,11 @@ export default async function NewSnippetPage() {
             id="code"
           />
         </div>
+        {formState.message ? (
+          <div className="bg-red-200 p-2 rounded mt-2 capitalize">
+            {formState.message}
+          </div>
+        ) : null}
         <button className=" rounded p-2 bg-blue-200">Create</button>
       </div>
     </form>

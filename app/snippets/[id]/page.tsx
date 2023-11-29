@@ -1,3 +1,4 @@
+import { deleteSnippet } from "@/actions";
 import { db } from "@/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -29,9 +30,11 @@ export default async function SnippetPage(props: SnippetPageProps) {
           >
             Edit
           </Link>
-          <button className="border rounded px-2 py-1 hover:opacity-40">
-            New
-          </button>
+          <form action={deleteSnippet.bind(null, snippet.id)}>
+            <button className="border rounded px-2 py-1 hover:opacity-40">
+              Delete
+            </button>
+          </form>
         </div>
       </div>
       <pre className="p-3 border rounded bg-gray-200 border-gray-200">
