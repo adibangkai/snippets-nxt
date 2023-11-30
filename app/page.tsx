@@ -16,16 +16,20 @@ export default async function Home() {
         </Link>
       </div>
       <div className="gap-2">
-        {snippets.map((snippet) => (
-          <Link
-            key={snippet.id}
-            href={`/snippets/${snippet.id}`}
-            className=" flex justify-between p-2 border rounded my-2 hover:border-gray-900 transition ease-in-out"
-          >
-            <div>{snippet.title}</div>
-            <div>view</div>
-          </Link>
-        ))}
+        {snippets.length !== 0 ? (
+          snippets.map((snippet) => (
+            <Link
+              key={snippet.id}
+              href={`/snippets/${snippet.id}/edit`}
+              className=" flex justify-between p-2 border rounded my-2 hover:border-gray-900 transition ease-in-out"
+            >
+              <div>{snippet.title}</div>
+              <div>view</div>
+            </Link>
+          ))
+        ) : (
+          <div>you have 0 snippets</div>
+        )}
       </div>
     </div>
   );

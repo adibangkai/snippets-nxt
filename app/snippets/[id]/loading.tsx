@@ -1,3 +1,3 @@
 export default function LoadingSnippet() {
-  return <div>loading...</div>;
+  return <div className="mt-12 font-bold">loading...</div>;
 }
