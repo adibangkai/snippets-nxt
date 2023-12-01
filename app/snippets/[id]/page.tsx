@@ -1,55 +1,100 @@
-import { deleteSnippet } from "@/actions";
-import { db } from "@/db";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+"use client";
 
-interface SnippetPageProps {
+import Link from "next/link";
+import { Editor } from "@monaco-editor/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+interface SnippetEditProps {
   params: {
     id: string;
   };
 }
-export default async function SnippetPage(props: SnippetPageProps) {
-  const snippet = await db.snippet.findFirst({
-    where: {
-      id: parseInt(props.params.id),
-    },
-  });
+interface SnippetProps {
+  id?: string;
+  title: string;
+  code: string;
+}
 
-  if (!snippet) {
-    return notFound();
+export default function SnippetEdit(props: SnippetEditProps) {
+  const id = props.params.id as string;
+  const [code, setCode] = useState("");
+  const [snippet, setSnippet] = useState<SnippetProps | undefined>();
+  const router = useRouter();
+  const handleEditor = (value: string = "") => {
+    setCode(value);
+  };
+
+  useEffect(() => {
+    const snip = localStorage.getItem("snippetsList")
+      ? JSON.parse(localStorage.getItem("snippetsList") as string).find(
+          (x: SnippetProps) => x.id === id
+        )
+      : null;
+    setSnippet(snip);
+  }, [id]);
+
+  function editSnippet() {
+    let entries = JSON.parse(localStorage.getItem("snippetsList") as string);
+    const index = entries.findIndex(
+      (item: SnippetProps) => item.id === snippet?.id
+    );
+    const updated = [
+      ...entries.slice(0, index),
+      Object.assign({}, entries[index], { id: snippet?.id, code }),
+      ...entries.slice(index + 1),
+    ];
+    localStorage.setItem("snippetsList", JSON.stringify(updated));
   }
 
+  function deleteSnippet() {
+    let entries = JSON.parse(localStorage.getItem("snippetsList") as string);
+    entries = entries.filter((item: SnippetProps) => item.id !== snippet?.id);
+    localStorage.setItem("snippetsList", JSON.stringify(entries));
+    router.push("/");
+  }
   return (
-    <div>
+    <div className="mt-12">
+      <Link href={"/"} className="font-bold hover:opacity-50">
+        &#8249;back
+      </Link>
       <div className="flex m-4 justify-between items-center">
-        <h1 className="text-xl font-bold">{snippet.title}</h1>
+        <h1 className="text-xl font-bold">{snippet?.title}</h1>
         <div className="flex gap-4">
-          <Link
-            href={`/snippets/${snippet.id}/edit`}
-            className="border rounded px-2 py-1 hover:opacity-40"
-          >
-            Edit
-          </Link>
-          <form action={deleteSnippet.bind(null, snippet.id)}>
-            <button className="border rounded px-2 py-1 hover:opacity-40">
+          <form>
+            <button
+              className="border rounded px-2 py-1 hover:opacity-40"
+              onClick={() => deleteSnippet()}
+            >
               Delete
             </button>
           </form>
         </div>
       </div>
-      <pre className="p-3 border rounded bg-gray-200 border-gray-200">
-        <code>{snippet.code}</code>
-      </pre>
+      {/* <SnippetEditForm snippet={snippet} /> */}
+      <div>
+        <Editor
+          height="40vh"
+          theme="vs-dark"
+          language="javascript"
+          width="100%"
+          defaultValue={snippet?.code}
+          options={{ minimap: { enabled: false } }}
+          onChange={handleEditor}
+        />
+        <form
+          className="mt-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            editSnippet();
+            router.push("/");
+          }}
+        >
+          <button type="submit" className="p-2 border rounded hover:opacity-60">
+            Save
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  const snippets = await db.snippet.findMany();
-
-  return snippets.map((snippet) => {
-    return {
-      id: snippet.id.toString(),
-    };
-  });
 }

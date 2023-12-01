@@ -52,7 +52,7 @@ export default function Home() {
           Object.values(snippets).map((snippet) => (
             <Link
               key={snippet.id}
-              href={`/snippets/${snippet.id}/edit`}
+              href={`/snippets/${snippet.id}`}
               className=" flex justify-between p-2 border rounded my-2 hover:border-gray-900 transition ease-in-out"
             >
               <div>{snippet.title}</div>

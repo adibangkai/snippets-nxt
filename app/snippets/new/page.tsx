@@ -72,11 +72,6 @@ export default function NewSnippetPage() {
           />
           <input type="hidden" name="code" value={code} />
         </div>
-        {/* {formState.message ? (
-          <div className="bg-red-200 p-2 rounded mt-2 capitalize">
-            {formState.message}
-          </div>
-        ) : null} */}
         <button className=" rounded p-2 border hover:border-black">
           Create
         </button>
