@@ -1,18 +1,47 @@
 "use client";
-import { createSnippet } from "@/actions";
+
 import { Editor } from "@monaco-editor/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useFormState } from "react-dom";
 
 export default function NewSnippetPage() {
-  const [formState, action] = useFormState(createSnippet, { message: "" });
-  const [code, setCode] = useState();
+  // const [formState, action] = useFormState(createSnippet, { message: "" });
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  const [title, setTitle] = useState("");
+
+  const uid = function () {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  };
+  let id = uid();
+  function addSnippet() {
+    let entries = [];
+
+    if (localStorage.getItem("snippetsList")) {
+      entries = JSON.parse(localStorage.getItem("snippetsList") as string);
+      entries.push({ id, title, code });
+      localStorage.setItem("snippetsList", JSON.stringify(entries));
+    } else {
+      entries.push({ id, title, code });
+      localStorage.setItem(
+        "snippetsList",
+        JSON.stringify([{ id, title, code }])
+      );
+    }
+  }
   const handleEditor = (value: string = "") => {
     setCode(value);
   };
   return (
-    <form action={action} className="mt-12">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        addSnippet();
+        router.push("/");
+      }}
+      className="mt-12"
+    >
       <Link href={"/"}>
         <h3 className="font-bold hover:opacity-50 mb-4">&#8249;back</h3>
       </Link>{" "}
@@ -26,6 +55,7 @@ export default function NewSnippetPage() {
             name="title"
             className="border rounded p-2 w-full"
             id="title"
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
         <div className="flex gap-4">
@@ -42,11 +72,11 @@ export default function NewSnippetPage() {
           />
           <input type="hidden" name="code" value={code} />
         </div>
-        {formState.message ? (
+        {/* {formState.message ? (
           <div className="bg-red-200 p-2 rounded mt-2 capitalize">
             {formState.message}
           </div>
-        ) : null}
+        ) : null} */}
         <button className=" rounded p-2 border hover:border-black">
           Create
         </button>

@@ -1,8 +1,31 @@
-import { db } from "@/db";
+// import { db } from "@/db";
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function Home() {
-  const snippets = await db.snippet.findMany();
+export default function Home() {
+  // const snippets = await db.snippet.findMany();
+  const [snippets, setSnippets] = useState("");
+  const [loading, setLoading] = useState(false);
+  const snip = [
+    {
+      id: "1",
+      title: "example snippet",
+      code: "function test(a,b) {}",
+    },
+  ];
+
+  if (typeof window !== "undefined") {
+    // Perform localStorage action
+    if (!localStorage.getItem("snippetsList")) {
+      localStorage.setItem("snippetsList", JSON.stringify(snip));
+    }
+  }
+  useEffect(() => {
+    setLoading(true);
+    setSnippets(JSON.parse(localStorage.getItem("snippetsList") as string));
+    setLoading(false);
+  }, []);
 
   return (
     <div className="mt-12">
@@ -16,7 +39,8 @@ export default async function Home() {
         </Link>
       </div>
       <div className="gap-2">
-        {snippets.length !== 0 ? (
+        {loading && <div>loading</div>}
+        {snippets && snippets.length !== 0 ? (
           snippets.map((snippet) => (
             <Link
               key={snippet.id}
