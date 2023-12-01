@@ -2,10 +2,18 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+interface SnippetsListProps {
+  snippets: Snippet[];
+}
 
+interface Snippet {
+  id: string;
+  title: string;
+  code: string;
+}
 export default function Home() {
   // const snippets = await db.snippet.findMany();
-  const [snippets, setSnippets] = useState("");
+  const [snippets, setSnippets] = useState<SnippetsListProps | null>();
   const [loading, setLoading] = useState(false);
   const snip = [
     {
@@ -40,8 +48,8 @@ export default function Home() {
       </div>
       <div className="gap-2">
         {loading && <div>loading</div>}
-        {snippets && snippets.length !== 0 ? (
-          snippets.map((snippet) => (
+        {snippets && Object.values(snippets).length !== 0 ? (
+          Object.values(snippets).map((snippet) => (
             <Link
               key={snippet.id}
               href={`/snippets/${snippet.id}/edit`}

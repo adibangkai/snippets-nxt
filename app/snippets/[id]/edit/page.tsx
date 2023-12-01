@@ -32,7 +32,7 @@ export default function SnippetEdit(props: SnippetEditProps) {
         )
       : null;
     setSnippet(snip);
-  }, []);
+  }, [id]);
 
   function editSnippet() {
     let entries = JSON.parse(localStorage.getItem("snippetsList") as string);
@@ -46,6 +46,13 @@ export default function SnippetEdit(props: SnippetEditProps) {
     ];
     localStorage.setItem("snippetsList", JSON.stringify(updated));
   }
+
+  function deleteSnippet() {
+    let entries = JSON.parse(localStorage.getItem("snippetsList") as string);
+    entries = entries.filter((item: SnippetProps) => item.id !== snippet?.id);
+    localStorage.setItem("snippetsList", JSON.stringify(entries));
+    router.push("/");
+  }
   return (
     <div className="mt-12">
       <Link href={"/"} className="font-bold hover:opacity-50">
@@ -55,7 +62,10 @@ export default function SnippetEdit(props: SnippetEditProps) {
         <h1 className="text-xl font-bold">{snippet?.title}</h1>
         <div className="flex gap-4">
           <form>
-            <button className="border rounded px-2 py-1 hover:opacity-40">
+            <button
+              className="border rounded px-2 py-1 hover:opacity-40"
+              onClick={() => deleteSnippet()}
+            >
               Delete
             </button>
           </form>
